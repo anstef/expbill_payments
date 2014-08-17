@@ -100,7 +100,7 @@ class Qiwi(object):
         self.conn = sqlite3.connect(settings.db_name)
         self.cur = self.conn.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS transactions (trans_id TEXT)")
-        self.cur.execute("DELETE FROM transactions")
+        #self.cur.execute("DELETE FROM transactions")
 
     def process(self):
         try:
