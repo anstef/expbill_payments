@@ -147,7 +147,7 @@ class PaymentTransactionTest(QiwiTest):
             params={'sum': u'100.66',
                     'trans': u'123456',
                     'uid': u'#t12_34-56',
-                    'secret': '12345678901234567890hgh55g54'})
+                    'secret': qiwi.settings.billing_secret})
 
     def test_fix_account_misprint(self, get_mock, send_email_mock):
         get_resp_mock = mock.Mock()
@@ -163,18 +163,18 @@ class PaymentTransactionTest(QiwiTest):
             params={'sum': u'100.66',
                     'trans': u'123456',
                     'uid': u'#t12_34-56',
-                    'secret': '12345678901234567890hgh55g54'}))
+                    'secret': qiwi.settings.billing_secret}))
         self.assertEqual(get_mock.call_args_list[1], mock.call(
             qiwi.settings.billing_payment_url,
             params={'sum': u'100.66',
                     'trans': u'123456',
                     'uid': u't12_34-56',
-                    'secret': '12345678901234567890hgh55g54'}))
+                    'secret': qiwi.settings.billing_secret}))
         self.assertEqual(get_mock.call_args_list[2], mock.call(
             qiwi.settings.billing_payment_url,
             params={'sum': u'100.66',
                     'trans': u'123456',
                     'uid': u't12_3456',
-                    'secret': '12345678901234567890hgh55g54'}))
+                    'secret': qiwi.settings.billing_secret}))
         self.assertTrue(send_email_mock.called)
 
