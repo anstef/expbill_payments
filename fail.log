@@ -1,0 +1,6 @@
+2014-08-17 14:37:02,838 - failed_payment - ERROR - Can't create billing transaction id=999999900352844497, payer=Tttt-56, sum=2.00. Http status: 200, response test: -1
+2014-08-17 14:37:05,085 - failed_payment - ERROR - Can't create billing transaction id=999999900352843708, payer=Tttt-56, sum=1.00. Http status: 200, response test: -1
+2014-08-17 14:38:44,515 - failed_payment - ERROR - Can't create billing transaction id=999999900352844497, payer=Tttt-56, sum=2.00. Http status: 200, response test: -1
+No such payer in billing
+2014-08-17 14:38:46,412 - failed_payment - ERROR - Can't create billing transaction id=999999900352843708, payer=Tttt-56, sum=1.00. Http status: 200, response test: -1
+No such payer in billing
