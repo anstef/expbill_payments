@@ -60,8 +60,8 @@ class PaymentTransaction(object):
         return self.cursor.fetchone()[0]
 
     def process(self):
-        self.cursor.execute("INSERT INTO transactions VALUES(%s)" % self.trans_id)
         self.save()
+        self.cursor.execute("INSERT INTO transactions VALUES(%s)" % self.trans_id)
 
     def save(self):
         if not self.payer:
