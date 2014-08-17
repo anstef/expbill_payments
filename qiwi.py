@@ -53,7 +53,6 @@ class PaymentTransaction(object):
         else:
             self.sum = None
         self.payer = payer.strip() if payer else ''
-        self.payer = u'Tttt-56'
         self.comment = comment
 
     def is_processed(self):
