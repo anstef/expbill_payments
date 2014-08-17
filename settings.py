@@ -18,3 +18,5 @@ email_from_pass = 'q123'
 email_to = 'admin@yoursite.com'
 smtp_server = 'smtp.gmail.com'
 smtp_port = '587'
+
+from local_settings import *
