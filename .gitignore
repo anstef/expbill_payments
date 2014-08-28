@@ -1,5 +1,6 @@
 *.pyc
 .idea/
+.env/
 local_settings.py
 fail.log
 success.log
