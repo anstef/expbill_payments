@@ -34,7 +34,7 @@ def send_email(message):
         server.starttls()
         server.login(settings.email_from, settings.email_from_pass)
         header = 'Subject: QIWI ExpertBilling\n\n'
-        server.sendmail(settings.email_to, "silhaze@gmail.com", header + message)
+        server.sendmail(settings.email_from, settings.email_to, header + message)
     except Exception, e:
         error_logger.exception(e)
 
@@ -114,7 +114,7 @@ class Qiwi(object):
 
     def _process(self):
         for payment in self.get_payments():
-            if payment.is_processed():
+            if not payment.trans_id or payment.is_processed():
                 continue
 
             payment.process()
