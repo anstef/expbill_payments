@@ -28,6 +28,7 @@ success_handler.setFormatter(formatter)
 success_handler.setLevel(logging.INFO)
 success_logger.addHandler(success_handler)
 
+
 def send_email(message):
     try:
         server = smtplib.SMTP(settings.smtp_server, settings.smtp_port)
@@ -113,11 +114,18 @@ class Qiwi(object):
             self.close_db_conn()
 
     def _process(self):
-        for payment in self.get_payments():
+        payments = self.get_payments()
+        has_valid_payments = False
+        for payment in payments:
             if not payment.trans_id or payment.is_processed():
                 continue
+            elif not has_valid_payments:
+                has_valid_payments = True
 
             payment.process()
+
+        if not has_valid_payments:
+            success_logger.info('There are no new payments with transaction id')
 
     def get_payments(self):
         try:

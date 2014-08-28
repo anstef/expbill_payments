@@ -18,7 +18,6 @@ class QiwiTest(unittest.TestCase):
 
     def tearDown(self):
         if self.qiwi.conn:
-            self.qiwi.conn.commit()
             self.qiwi.conn.close()
 
         conn = sqlite3.connect(qiwi.settings.db_name)
@@ -177,4 +176,27 @@ class PaymentTransactionTest(QiwiTest):
                     'uid': u't12_3456',
                     'secret': qiwi.settings.billing_secret}))
         self.assertTrue(send_email_mock.called)
+
+
+class TestQiwiProccess(QiwiTest):
+    @mock.patch.object(qiwi.Qiwi, 'get_payments')
+    @mock.patch.object(qiwi.PaymentTransaction, 'process')
+    def test_simple(self, payment_process_mock, get_payments_mock):
+        processed_payment_transaction = qiwi.PaymentTransaction(self.qiwi.cur, 2, '10', 'payer3', 'test3')
+        processed_payment_transaction.is_processed = mock.Mock()
+        processed_payment_transaction.is_processed.return_value = True
+
+        get_payments_mock.return_value = [
+            # new valid
+            qiwi.PaymentTransaction(self.qiwi.cur, 1, '10', 'payer1', 'test1'),
+            # invalid
+            qiwi.PaymentTransaction(self.qiwi.cur, None, '10', 'payer2', 'test2'),
+            # processed valid
+            processed_payment_transaction,
+            # new valid
+            qiwi.PaymentTransaction(self.qiwi.cur, 3, '10', 'payer4', 'test4'),
+        ]
+        self.qiwi.process()
+        self.assertEqual(payment_process_mock.call_count, 2)
+
 
