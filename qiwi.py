@@ -52,6 +52,24 @@ class QiwiProcessException(Exception):
 
 
 class PaymentTransaction(object):
+    REPLACE_CYRILIC_MAP = {
+        u'а': u'a',
+        u'б': u'b',
+        u'в': u'b',
+        u'д': u'd',
+        u'е': u'e',
+        u'к': u'k',
+        u'л': u'l',
+        u'м': u'm',
+        u'н': u'n',
+        u'о': u'o',
+        u'р': u'p',
+        u'с': u'c',
+        u'т': u't',
+        u'х': u'x',
+        u'ю': u'u',
+    }
+
     def __init__(self, cursor, trans_id, sum_raw, payer, comment=None):
         self.cursor = cursor
         self.trans_id = trans_id
@@ -61,7 +79,14 @@ class PaymentTransaction(object):
         else:
             self.sum = None
         self.payer = payer.strip() if payer else ''
+        self._replace_cyrilic_from_payer()
+
         self.comment = comment
+
+    def _replace_cyrilic_from_payer(self):
+        for cyrilic_letter, latin_letter in self.REPLACE_CYRILIC_MAP.iteritems():
+            if cyrilic_letter in self.payer:
+                self.payer = self.payer.replace(cyrilic_letter, latin_letter)
 
     def is_processed(self):
         self.cursor.execute("SELECT COUNT(*) FROM transactions WHERE trans_id=%s" % self.trans_id)

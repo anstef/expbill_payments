@@ -177,6 +177,23 @@ class PaymentTransactionTest(QiwiTest):
                     'secret': qiwi.settings.billing_secret}))
         self.assertTrue(send_email_mock.called)
 
+    def test_replace_cyrilic(self, get_mock, send_email_mock):
+        get_resp_mock = mock.Mock()
+        get_resp_mock.status_code = 200
+        get_resp_mock.text = '-1'
+        get_mock.return_value = get_resp_mock
+
+        payment = qiwi.PaymentTransaction(
+            self.qiwi.cur, u'123456', u'100.66 руб.', u'а123абвдеклмнорстхю', u'test comment')
+        payment.save()
+
+        self.assertEqual(get_mock.call_args_list[0], mock.call(
+            qiwi.settings.billing_payment_url,
+            params={'sum': u'100.66',
+                    'trans': u'123456',
+                    'uid': u'a123abbdeklmnopctxu',
+                    'secret': qiwi.settings.billing_secret}))
+
 
 class TestQiwiProccess(QiwiTest):
     @mock.patch.object(qiwi.Qiwi, 'get_payments')
