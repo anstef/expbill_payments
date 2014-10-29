@@ -173,7 +173,7 @@ class PaymentTransactionTest(QiwiTest):
             qiwi.settings.billing_payment_url,
             params={'sum': u'100.66',
                     'trans': u'123456',
-                    'uid': u't12_3456',
+                    'uid': u'1234-56',
                     'secret': qiwi.settings.billing_secret}))
         self.assertTrue(send_email_mock.called)
 

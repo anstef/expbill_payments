@@ -8,34 +8,41 @@ import logging
 from BeautifulSoup import BeautifulSoup
 import sqlite3
 import smtplib
+import os
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.header import Header
 
 import settings
 
 
 formatter = logging.Formatter(u'%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
 error_logger = logging.getLogger('failed_payment')
 error_logger.setLevel(logging.ERROR)
-error_handler = logging.FileHandler('fail.log')
+error_handler = logging.FileHandler(os.path.join(current_dir, 'fail.log'))
 error_handler.setFormatter(formatter)
 error_handler.setLevel(logging.ERROR)
 error_logger.addHandler(error_handler)
 
 success_logger = logging.getLogger('success_payments')
 success_logger.setLevel(logging.INFO)
-success_handler = logging.FileHandler('success.log')
+success_handler = logging.FileHandler(os.path.join(current_dir, 'success.log'))
 success_handler.setFormatter(formatter)
 success_handler.setLevel(logging.INFO)
 success_logger.addHandler(success_handler)
 
 
-def send_email(message):
+def send_email(subject, message):
     try:
         server = smtplib.SMTP(settings.smtp_server, settings.smtp_port)
         server.starttls()
         server.login(settings.email_from, settings.email_from_pass)
-        header = 'Subject: QIWI ExpertBilling\n\n'
-        server.sendmail(settings.email_from, settings.email_to, header + message)
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = Header(subject, 'utf-8')
+        msg.attach(MIMEText(message.encode('utf-8'), 'html', 'UTF-8'))
+        server.sendmail(settings.email_from, settings.email_to, msg.as_string())
     except Exception, e:
         error_logger.exception(e)
 
@@ -68,7 +75,7 @@ class PaymentTransaction(object):
         if not self.payer:
             msg = u"Can't create billing transaction for empty payer id=%s, sum=%s." % (self.trans_id, self.sum)
             error_logger.error(msg)
-            send_email(msg)
+            send_email(u'BAD empty payer %s руб.' % self.sum, msg)
             return
 
         res = self.create_billing_payment(self.payer)
@@ -77,18 +84,20 @@ class PaymentTransaction(object):
             res = self.create_billing_payment(re.sub('[^\w-]', '', self.payer))
 
         if res.status_code == 200 and res.text == '-1':
-            res = self.create_billing_payment(re.sub('[^\w]', '', self.payer))
+            res = self.create_billing_payment(re.sub('[^\d-]', '', self.payer))
 
         if res.status_code == 200 and res.text == '0':
-            success_logger.info(u'Billing payment sucessfull created - transaction_id, sum, payer, comments: %s'
-                                % [self.trans_id, self.sum, self.payer, self.comment])
+            msg = u'Billing payment sucessfull created - transaction_id, sum, payer, comments: %s' % [self.trans_id, self.sum, self.payer, self.comment]
+            success_logger.info(msg)
+            send_email(u'OK %s %s руб.' % (self.payer, self.sum), msg)
         else:
-            msg = u"Can't create billing transaction id=%s, payer=%s, sum=%s. Http status: %s, response test: %s" % \
-                  (self.trans_id, self.payer, self.sum, res.status_code, res.text)
+            msg = u"Can't create billing transaction id=%s, payer=%s, sum=%s. Http status: %s" % \
+                  (self.trans_id, self.payer, self.sum, res.status_code)
             if res.text == '-1':
                 msg += u'\nNo such payer in billing'
+            send_email(u'BAD %s %s руб.' % (self.payer, self.sum), msg)
+            msg += u'\nresponse text: %s'% res.text
             error_logger.error(msg)
-            send_email(msg)
 
     def create_billing_payment(self, payer):
         return requests.get(
@@ -105,6 +114,7 @@ class Qiwi(object):
 
     def process(self):
         try:
+            success_logger.info("Start processing")
             self._process()
         except QiwiProcessException, e:
             error_logger.error(e)
@@ -112,6 +122,7 @@ class Qiwi(object):
             error_logger.exception(e)
         finally:
             self.close_db_conn()
+            success_logger.info("Stop processing")
 
     def _process(self):
         payments = self.get_payments()

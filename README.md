@@ -4,7 +4,7 @@ Features:
 -----
 
  * Load payments from Qiwi with simple parsing daily payments HTML-page.
- * The successfully processed transaction will not duplicated in billing script restarting
+ * The successfully processed transaction don't duplicate when billing script restarts.
 
 Usage:
 -----
