@@ -45,7 +45,7 @@ class Qiwi(BaseProvider):
         return self.parse_payments_page(payments_page)
 
     def parse_payments_page(self, body):
-        payments = []
+        transactions = []
 
         for payment in BeautifulSoup(body).findAll('div', {'class': 'reportsLine status_SUCCESS'}):
             sum = payment.find('div', {'class': 'originalExpense'}, recursive=False).span.string
@@ -54,11 +54,11 @@ class Qiwi(BaseProvider):
             comment = payer_div.find('div', {'class': 'provider'}, recursive=False).text
             payer = payer_div.find('div', {'class': 'comment'}, recursive=False).string
 
-            payment_processor = BaseTransaction(self.cur, trans_id, sum, payer, comment)
-            if payment_processor.trans_id and not payment_processor.is_processed():
-                payments.append(BaseTransaction(self.cur, trans_id, sum, payer, comment))
+            transaction = BaseTransaction(self.cur, trans_id, sum, payer, comment)
+            if transaction.trans_id and not transaction.is_processed():
+                transactions.append(transaction)
 
-        return payments
+        return transactions
 
     def get_last_payments_page(self):
         s = requests.Session()

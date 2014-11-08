@@ -6,8 +6,8 @@ qiwi_login = 'login'
 qiwi_pass = 'pass'
 
 #yandex money
-ym_mail = 'your-notification-mail@yandex.ru'
-ym_pass = 'q123'
+ym_mail_login = 'your-notification-mail' # without @yandex.ru
+ym_mail_pass = 'q123'
 
 #billing
 billing_payment_url = 'http://127.0.0.1/payments.simpleterminal/simpleterminal/payment/'

@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 # Author: Andrey Ovchinnikov anstef42@gmail.com
 
-import json
 import imaplib
+import email
 
-import requests
 from BeautifulSoup import BeautifulSoup
 import settings
 from logger import success_logger, error_logger
@@ -29,26 +28,41 @@ class YandexMoney(BaseProvider):
             success_logger.info("Stop processing")
 
     def get_payments(self):
-        try:
-            payments_page = self.get_payment_html()
-        except requests.ConnectionError:
-            raise YandexMoneyProcessException(u"Can't request qiwi URL")
+        self._mail_connect()
+        unread_messages = self._get_unread()
 
-        return self.parse_payments_page(payments_page)
+        if not unread_messages:
+            return []
 
-    def get_payment_html(self):
-        pass
+        transactions = []
+        for e_id in unread_messages.split():
+            transaction = self.parse_payment_message(self._get_msg_body(e_id))
+            if transaction:
+                transactions.append(transaction)
 
-    def parse_payments_page(self, body):
-        payments = []
+        return transactions
 
-        for payment in BeautifulSoup(body).findAll('div', {'class': 'reportsLine status_SUCCESS'}):
-            sum = payment.find('div', {'class': 'originalExpense'}, recursive=False).span.string
-            trans_id = payment.find('div', {'class': 'DateWithTransaction'}, recursive=False).div.string
-            payer_div = payment.find('div', {'class': 'ProvWithComment'}, recursive=False)
-            comment = payer_div.find('div', {'class': 'provider'}, recursive=False).text
-            payer = payer_div.find('div', {'class': 'comment'}, recursive=False).string
+    def parse_payment_message(self, body):
+        if BeautifulSoup(body).find(text=u'Деньги успешно зачислены'):
+            sum = BeautifulSoup(body).find(text=u'Сумма').previous.previous.nextSibling.contents[0].text
+            payer = BeautifulSoup(body).find(text=u'Комментарий').previous.previous.nextSibling.contents[0].text
 
-            payments.append(BaseTransaction(None, None, sum, payer, comment))
+            return BaseTransaction(None, None, sum.replace(u'&nbsp;', ''), payer)
 
-        return payments
+        return None
+
+    def _mail_connect(self):
+        self.mail_conn = imaplib.IMAP4_SSL(settings.ym_mail_server, settings.ym_mail_port)
+        self.mail_conn.login(settings.ym_mail_login, settings.ym_mail_pass)
+        self.mail_conn.select('INBOX')
+
+    def _get_unread(self):
+        status, response = self.mail_conn.search(None, '(UNSEEN)')
+        if status != 'OK':
+            raise YandexMoneyProcessException(u"Can't get unread messages. Status: %s" % status)
+
+        return response[0]
+
+    def _get_msg_body(self, e_id):
+        _, response = self.mail_conn.fetch(e_id, '(RFC822)')
+        return email.message_from_string(response[0][1]).get_payload()[1].get_payload().decode("quoted-printable")

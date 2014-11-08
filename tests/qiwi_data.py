@@ -129,6 +129,86 @@ valid_body = u"""
 	    </div>
 	</div>
 </div>
+
+
+ <div class="reportsLine status_SUCCESS" data-container-name="item">
+    <i class="icon icon_SUCCESS fa fa-check-circle"></i>
+    <i class="icon icon_ERROR fa fa-times-circle"></i>
+    <i class="icon icon_PROCESSED fa fa-clock-o"></i>
+
+ 	<div class="DateWithTransaction">
+	    <span class="date">10.08.2014</span>
+	    <span class="time">20:12:51</span>
+
+	        <div class="transaction">123456</div>
+
+	</div>
+
+ 	    <div class="IncomeWithExpend expenditure">
+	        <div class="cash">1,00 руб. </div>
+	        <div class="commission">
+ 	        </div>
+
+ 	            <div class="operations"><a target="_blank" href="/report/cheque.action?transaction=4798746524&amp;direction=OUT" class="cheque">Распечатать чек</a></div>
+ 	    </div>
+ 	<div class="originalExpense">
+	    <span>1 001,50 руб. </span>
+	</div>
+ 	<div class="ProvWithComment">
+	    <div class="provider">
+	        <span>Visa QIWI Wallet</span>
+	        <span class="opNumber"> some info</span>
+	    </div>
+	    <div class="comment">234-567</div>
+	</div>
+	<div class="clearBoth"></div>
+	<div class="extra" data-container-name="item-extra">
+		<div class="item">
+	        <span class="key">Транзакция:</span>
+	        <span class="value">999999900352843708</span>
+	    </div>
+	</div>
+</div>
+
+
+ <div class="reportsLine status_SUCCESS" data-container-name="item">
+    <i class="icon icon_SUCCESS fa fa-check-circle"></i>
+    <i class="icon icon_ERROR fa fa-times-circle"></i>
+    <i class="icon icon_PROCESSED fa fa-clock-o"></i>
+
+ 	<div class="DateWithTransaction">
+	    <span class="date">10.08.2014</span>
+	    <span class="time">20:12:51</span>
+
+	        <div class="transaction"></div>
+
+	</div>
+
+ 	    <div class="IncomeWithExpend expenditure">
+	        <div class="cash">1,00 руб. </div>
+	        <div class="commission">
+ 	        </div>
+
+ 	            <div class="operations"><a target="_blank" href="/report/cheque.action?transaction=4798746524&amp;direction=OUT" class="cheque">Распечатать чек</a></div>
+ 	    </div>
+ 	<div class="originalExpense">
+	    <span>1 001,50 руб. </span>
+	</div>
+ 	<div class="ProvWithComment">
+	    <div class="provider">
+	        <span>Visa QIWI Wallet</span>
+	        <span class="opNumber"> some info</span>
+	    </div>
+	    <div class="comment">234-567</div>
+	</div>
+	<div class="clearBoth"></div>
+	<div class="extra" data-container-name="item-extra">
+		<div class="item">
+	        <span class="key">Транзакция:</span>
+	        <span class="value">999999900352843708</span>
+	    </div>
+	</div>
+</div>
  
  
  <div class="divider"><!--  --></div>

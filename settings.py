@@ -8,6 +8,12 @@ qiwi_payments_url = 'https://visa.qiwi.com/report/list.action?type=1'
 qiwi_login = 'login'
 qiwi_pass = 'pass'
 
+#yandex money
+ym_mail_server = 'imap.yandex.ru'
+ym_mail_port = '993'
+ym_mail_login = 'your-notification-mail@yandex.ru'
+ym_mail_pass = 'q123'
+
 #billing
 billing_payment_url = 'http://yourbilling.com/payments.simpleterminal/simpleterminal/payment/'
 billing_secret = '123456'

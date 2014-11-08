@@ -4,6 +4,5 @@
 from providers.qiwi import Qiwi
 from providers.yandex_money import YandexMoney
 
-#Qiwi().process()
+Qiwi().process()
 YandexMoney().process()
-

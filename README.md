@@ -3,7 +3,8 @@ Payment loader to ExpertBilling
 Features:
 -----
 
- * Load payments from Qiwi with simple parsing daily payments HTML-page.
+ * Loads payments from Qiwi with simple parsing daily payments HTML-page.
+ * Loads payments from Yandex Money by parsing unread notification messages from email.
  * The successfully processed transaction don't duplicate when billing script restarts.
 
 Usage:
