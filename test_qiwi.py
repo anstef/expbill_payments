@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import mock
 import json
 import sqlite3
-import re
 
-import qiwi
+import mock
+from providers import qiwi
+from transactions import base_transaction
+import re
 
 
 class QiwiTest(unittest.TestCase):
@@ -27,7 +28,7 @@ class QiwiTest(unittest.TestCase):
         conn.close()
 
 
-@mock.patch.object(qiwi, 'send_email')
+@mock.patch.object(base_transaction, 'send_email')
 @mock.patch.object(qiwi.requests.Session, 'post')
 @mock.patch.object(qiwi.requests.Session, 'get')
 class TestLastPaymentsPage(QiwiTest):
@@ -104,7 +105,7 @@ class TestLastPaymentsPage(QiwiTest):
             self.qiwi.get_last_payments_page()
 
 
-@mock.patch.object(qiwi, 'send_email')
+@mock.patch.object(base_transaction, 'send_email')
 class PaymentsParsingTest(QiwiTest):
     def test_success(self, *args):
         import test_qiwi_data
@@ -124,11 +125,11 @@ class PaymentsParsingTest(QiwiTest):
         self.assertEqual(payments, [])
 
 
-@mock.patch.object(qiwi, 'send_email')
+@mock.patch.object(base_transaction, 'send_email')
 @mock.patch.object(qiwi.requests, 'get')
 class PaymentTransactionTest(QiwiTest):
     def test_process(self, get_mock, send_email_mock):
-        payment = qiwi.PaymentTransaction(self.qiwi.cur, u'123456', u'100.66 руб.', u'123-456', u'test comment')
+        payment = base_transaction.BaseTransaction(self.qiwi.cur, u'123456', u'100.66 руб.', u'123-456', u'test comment')
         self.assertFalse(payment.is_processed())
         payment.process()
         self.assertTrue(payment.is_processed())
@@ -139,7 +140,7 @@ class PaymentTransactionTest(QiwiTest):
         get_resp_mock.text = '1'
         get_mock.return_value = get_resp_mock
 
-        payment = qiwi.PaymentTransaction(self.qiwi.cur, u'123456', u'100.66 руб.', u'#t12_34-56', u'test comment')
+        payment = base_transaction.BaseTransaction(self.qiwi.cur, u'123456', u'100.66 руб.', u'#t12_34-56', u'test comment')
         payment.save()
         get_mock.assert_called_once_with(
             qiwi.settings.billing_payment_url,
@@ -154,7 +155,7 @@ class PaymentTransactionTest(QiwiTest):
         get_resp_mock.text = '-1'
         get_mock.return_value = get_resp_mock
 
-        payment = qiwi.PaymentTransaction(self.qiwi.cur, u'123456', u'100.66 руб.', u'#t12_34-56', u'test comment')
+        payment = base_transaction.BaseTransaction(self.qiwi.cur, u'123456', u'100.66 руб.', u'#t12_34-56', u'test comment')
         payment.save()
         self.assertEqual(get_mock.call_count, 3)
         self.assertEqual(get_mock.call_args_list[0], mock.call(
@@ -183,7 +184,7 @@ class PaymentTransactionTest(QiwiTest):
         get_resp_mock.text = '-1'
         get_mock.return_value = get_resp_mock
 
-        payment = qiwi.PaymentTransaction(
+        payment = base_transaction.BaseTransaction(
             self.qiwi.cur, u'123456', u'100.66 руб.', u'а123абвдеклмнорстхю', u'test comment')
         payment.save()
 
@@ -197,21 +198,21 @@ class PaymentTransactionTest(QiwiTest):
 
 class TestQiwiProccess(QiwiTest):
     @mock.patch.object(qiwi.Qiwi, 'get_payments')
-    @mock.patch.object(qiwi.PaymentTransaction, 'process')
+    @mock.patch.object(base_transaction.BaseTransaction, 'process')
     def test_simple(self, payment_process_mock, get_payments_mock):
-        processed_payment_transaction = qiwi.PaymentTransaction(self.qiwi.cur, 2, '10', 'payer3', 'test3')
+        processed_payment_transaction = base_transaction.BaseTransaction(self.qiwi.cur, 2, '10', 'payer3', 'test3')
         processed_payment_transaction.is_processed = mock.Mock()
         processed_payment_transaction.is_processed.return_value = True
 
         get_payments_mock.return_value = [
             # new valid
-            qiwi.PaymentTransaction(self.qiwi.cur, 1, '10', 'payer1', 'test1'),
+            base_transaction.BaseTransaction(self.qiwi.cur, 1, '10', 'payer1', 'test1'),
             # invalid
-            qiwi.PaymentTransaction(self.qiwi.cur, None, '10', 'payer2', 'test2'),
+            base_transaction.BaseTransaction(self.qiwi.cur, None, '10', 'payer2', 'test2'),
             # processed valid
             processed_payment_transaction,
             # new valid
-            qiwi.PaymentTransaction(self.qiwi.cur, 3, '10', 'payer4', 'test4'),
+            base_transaction.BaseTransaction(self.qiwi.cur, 3, '10', 'payer4', 'test4'),
         ]
         self.qiwi.process()
         self.assertEqual(payment_process_mock.call_count, 2)

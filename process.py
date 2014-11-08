@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # Author: Andrey Ovchinnikov anstef42@gmail.com
 
-import qiwi
+from providers.qiwi import Qiwi
+from providers.yandex_money import YandexMoney
 
-qiwi.Qiwi().process()
+#Qiwi().process()
+YandexMoney().process()
+
