@@ -52,6 +52,7 @@ class BaseTransaction(object):
             self.sum = re.sub('[^\d\.]', '', self.sum)
         else:
             self.sum = None
+        self.payer_raw = payer.strip() if payer else ''
         self.payer = payer.strip() if payer else ''
         self._replace_cyrilic_from_payer()
 
@@ -92,11 +93,11 @@ class BaseTransaction(object):
             send_email(u'OK %s %s руб.' % (self.payer, self.sum), msg)
         else:
             msg = u"Can't create billing transaction id=%s, payer=%s, sum=%s. Http status: %s" % \
-                  (self.trans_id, self.payer, self.sum, res.status_code)
+                  (self.trans_id, self.payer_raw, self.sum, res.status_code)
             if res.text == '-1':
                 msg += u'\nNo such payer in billing'
-            send_email(u'BAD %s %s руб.' % (self.payer, self.sum), msg)
-            msg += u'\nresponse text: %s'% res.text
+            send_email(u'BAD %s %s руб.' % (self.payer_raw, self.sum), msg)
+            msg += u'\nresponse text: %s' % res.text
             error_logger.error(msg)
 
     def create_billing_payment(self, payer):
