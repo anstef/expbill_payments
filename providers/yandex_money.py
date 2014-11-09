@@ -65,4 +65,4 @@ class YandexMoney(BaseProvider):
 
     def _get_msg_body(self, e_id):
         _, response = self.mail_conn.fetch(e_id, '(RFC822)')
-        return email.message_from_string(response[0][1]).get_payload()[1].get_payload().decode("quoted-printable")
+        return email.message_from_string(response[0][1]).get_payload().decode("quoted-printable")
