@@ -54,7 +54,7 @@ class Qiwi(BaseProvider):
             comment = payer_div.find('div', {'class': 'provider'}, recursive=False).text
             payer = payer_div.find('div', {'class': 'comment'}, recursive=False).string
 
-            transaction = BaseTransaction(self.cur, trans_id, sum, payer, comment)
+            transaction = BaseTransaction(self.cur, trans_id, sum, payer, comment, 'QIWI')
             if transaction.trans_id and not transaction.is_processed():
                 transactions.append(transaction)
 

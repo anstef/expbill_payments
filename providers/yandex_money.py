@@ -47,7 +47,7 @@ class YandexMoney(BaseProvider):
             sum = BeautifulSoup(body).find(text=u'Сумма').previous.previous.nextSibling.contents[0].text
             payer = BeautifulSoup(body).find(text=u'Комментарий').previous.previous.nextSibling.contents[0].text
 
-            return BaseTransaction(None, None, sum.replace(u'&nbsp;', ''), payer)
+            return BaseTransaction(None, None, sum.replace(u'&nbsp;', ''), payer, None, 'YM')
 
         return None
 

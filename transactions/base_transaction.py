@@ -44,7 +44,7 @@ class BaseTransaction(object):
         u'ю': u'u',
     }
 
-    def __init__(self, cursor, trans_id, sum_raw, payer, comment=None):
+    def __init__(self, cursor, trans_id, sum_raw, payer, comment=None, subject_prefix=''):
         self.cursor = cursor
         self.trans_id = trans_id
         if sum_raw:
@@ -57,6 +57,7 @@ class BaseTransaction(object):
         self._replace_cyrilic_from_payer()
 
         self.comment = comment
+        self.subject_prefix = subject_prefix
 
     def _replace_cyrilic_from_payer(self):
         for cyrilic_letter, latin_letter in self.REPLACE_CYRILIC_MAP.iteritems():
@@ -76,7 +77,7 @@ class BaseTransaction(object):
         if not self.payer:
             msg = u"Can't create billing transaction for empty payer id=%s, sum=%s." % (self.trans_id, self.sum)
             error_logger.error(msg)
-            send_email(u'BAD empty payer %s руб.' % self.sum, msg)
+            send_email(u'%s BAD empty payer %s руб.' % (self.subject_prefix, self.sum), msg)
             return
 
         res = self.create_billing_payment(self.payer)
@@ -90,13 +91,13 @@ class BaseTransaction(object):
         if res.status_code == 200 and res.text == '0':
             msg = u'Billing payment sucessfull created - transaction_id, sum, payer, comments: %s' % [self.trans_id, self.sum, self.payer, self.comment]
             success_logger.info(msg)
-            send_email(u'OK %s %s руб.' % (self.payer, self.sum), msg)
+            send_email(u'%s OK %s %s руб.' % (self.subject_prefix, self.payer, self.sum), msg)
         else:
             msg = u"Can't create billing transaction id=%s, payer=%s, sum=%s. Http status: %s" % \
                   (self.trans_id, self.payer_raw, self.sum, res.status_code)
             if res.text == '-1':
                 msg += u'\nNo such payer in billing'
-            send_email(u'BAD %s %s руб.' % (self.payer_raw, self.sum), msg)
+            send_email(u'%s BAD %s %s руб.' % (self.subject_prefix, self.payer_raw, self.sum), msg)
             msg += u'\nresponse text: %s' % res.text
             error_logger.error(msg)
 
