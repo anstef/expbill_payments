@@ -34,3 +34,7 @@ class TestYandexMoneyProccess(unittest.TestCase):
         ]
         self.provider.process()
         self.assertEqual(payment_process_mock.call_count, 2)
+
+    def test_sum(self):
+        trans = base_transaction.BaseTransaction(None, None, u'611 руб. 20 коп.', 'test_payer')
+        self.assertEqual(trans.sum, u'611.20')

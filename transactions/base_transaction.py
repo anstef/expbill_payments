@@ -48,7 +48,11 @@ class BaseTransaction(object):
         self.cursor = cursor
         self.trans_id = trans_id
         if sum_raw:
-            self.sum = sum_raw.replace(u'руб.', '').replace(',', '.')
+            if u'руб.' in sum_raw and u'коп.' in sum_raw:
+                self.sum = sum_raw.replace(u'руб.', '.').replace(u'коп.', '')
+            else:
+                self.sum = sum_raw.replace(u'руб.', '').replace(',', '.')
+
             self.sum = re.sub('[^\d\.]', '', self.sum)
         else:
             self.sum = None
