@@ -43,7 +43,8 @@ class YandexMoney(BaseProvider):
         return transactions
 
     def parse_payment_message(self, body):
-        if BeautifulSoup(body).find(text=u'Деньги успешно зачислены'):
+        if BeautifulSoup(body).find(text=u'Деньги успешно зачислены') or \
+                BeautifulSoup(body).find(text=u'Перевод от другого пользователя'):
             sum = BeautifulSoup(body).find(text=u'Сумма').previous.previous.nextSibling.contents[0].text
             payer = BeautifulSoup(body).find(text=u'Комментарий').previous.previous.nextSibling.contents[0].text
 
