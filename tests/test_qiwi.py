@@ -35,8 +35,13 @@ class QiwiTest(unittest.TestCase):
 class TestQiwiLastPaymentsPage(QiwiTest):
     def test_success(self, mock_get, mock_post, *args):
         post_resp_mock = mock.Mock()
-        post_resp_mock.status_code = 200
-        post_resp_mock.text = json.dumps({'data': {'token': 123456789}})
+        post_resp_mock.status_code = 201
+        post_resp_mock.text = json.dumps({
+            "entity": {
+                "user": "+123",
+                "ticket": "TGT-123"
+            },
+            "links": [{"rel": "sts", "href": "https://auth.qiwi.com/cas/sts"}]})
         mock_post.return_value = post_resp_mock
 
         get_resp_mock = mock.Mock()
@@ -50,14 +55,13 @@ class TestQiwiLastPaymentsPage(QiwiTest):
             str(mock_post.call_args_list[0]),
             "call('%s', headers={'X-Requested-With': 'XMLHttpRequest', "
             "'Accept': 'application/json, text/javascript, */*; q=0.01'}, "
-            "data={'source': 'MENU', 'login': '%s', 'password': '%s'})" %
+            "data={'login': '%s', 'password': '%s'})" %
             (qiwi.settings.qiwi_login_url, qiwi.settings.qiwi_login, qiwi.settings.qiwi_pass))
         self.assertEqual(
             str(mock_post.call_args_list[1]),
-            "call('%s', headers={'X-Requested-With': 'XMLHttpRequest', "
+            "call(u'https://auth.qiwi.com/cas/sts', headers={'X-Requested-With': 'XMLHttpRequest', "
             "'Accept': 'application/json, text/javascript, */*; q=0.01'}, "
-            "data={'source': 'MENU', 'login': '%s', 'password': '%s', 'loginToken': 123456789})" %
-            (qiwi.settings.qiwi_login_url, qiwi.settings.qiwi_login, qiwi.settings.qiwi_pass))
+            "data={'ticket': u'TGT-123', 'service': 'https://visa.qiwi.com/j_spring_cas_security_check'})")
         self.assertEqual(
             str(mock_get.call_args_list[0]),
             "call('%s')" % (qiwi.settings.qiwi_payments_url))
