@@ -68,24 +68,25 @@ class Qiwi(BaseProvider):
             data={'login': settings.qiwi_login, 'password': settings.qiwi_pass},
             headers={'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json, text/javascript, */*; q=0.01'})
 
-        if pimary_auth.status_code != 201:
+        if pimary_auth.status_code not in [200, 201]:
             raise QiwiProcessException(u'Primary auth fail. Status code: %s' % pimary_auth.status_code)
 
-        try:
-            pimary_auth_res = json.loads(pimary_auth.text)
-            token = pimary_auth_res['entity']['ticket']
-            token_link = pimary_auth_res['links'][0]['href']
-        except ValueError:
-            raise QiwiProcessException(u'Invalid auth response: %s' % pimary_auth.text)
-        except KeyError:
-            raise QiwiProcessException(u'Invalid auth response: %s' % pimary_auth.text)
+        if pimary_auth.status_code == 201:
+            try:
+                pimary_auth_res = json.loads(pimary_auth.text)
+                token = pimary_auth_res['entity']['ticket']
+                token_link = pimary_auth_res['links'][0]['href']
+            except ValueError:
+                raise QiwiProcessException(u'Invalid auth response: %s' % pimary_auth.text)
+            except KeyError:
+                raise QiwiProcessException(u'Invalid auth response: %s' % pimary_auth.text)
 
-        token_auth = s.post(token_link,
-               data={'service': 'https://visa.qiwi.com/j_spring_cas_security_check', 'ticket': token},
-               headers={'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json, text/javascript, */*; q=0.01'})
+            token_auth = s.post(token_link,
+                   data={'service': 'https://visa.qiwi.com/j_spring_cas_security_check', 'ticket': token},
+                   headers={'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json, text/javascript, */*; q=0.01'})
 
-        if pimary_auth.status_code not in [200, 201]:
-            raise QiwiProcessException(u'Token auth fail. Status code: %s' % token_auth.status_code)
+            if pimary_auth.status_code not in [200, 201]:
+                raise QiwiProcessException(u'Token auth fail. Status code: %s' % token_auth.status_code)
 
         payments = s.get(settings.qiwi_payments_url)
         if payments.status_code != 200:
