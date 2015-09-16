@@ -81,8 +81,11 @@ class Qiwi(BaseProvider):
             raise QiwiProcessException(u'Invalid auth response: %s' % pimary_auth.text)
 
         token_auth = s.post(token_link,
-               data=json.dumps({'service': 'https://visa.qiwi.com/j_spring_cas_security_check', 'ticket': token}),
+               data=json.dumps({'service': 'https://qiwi.ru/j_spring_cas_security_check', 'ticket': token}),
                headers={'Content-Type': 'application/json'})
+
+        if token_auth.status_code not in [200, 201]:
+            raise QiwiProcessException(u'Token auth fail. Status code: %s' % token_auth.status_code)
 
         try:
             token_auth_res = json.loads(token_auth.text)
@@ -92,10 +95,7 @@ class Qiwi(BaseProvider):
         except KeyError:
             raise QiwiProcessException(u'Invalid token response: %s' % token_auth.text)
 
-        if pimary_auth.status_code not in [200, 201]:
-            raise QiwiProcessException(u'Token auth fail. Status code: %s' % token_auth.status_code)
-
-        confirm_token = s.get('https://visa.qiwi.com/j_spring_cas_security_check?ticket=%s' % ticket)
+        confirm_token = s.get('https://qiwi.ru/j_spring_cas_security_check?ticket=%s' % ticket)
         if confirm_token.status_code != 200:
             raise QiwiProcessException(u'Confirm token fail. Status code: %s' % confirm_token.status_code)
 
