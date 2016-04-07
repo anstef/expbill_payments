@@ -3,8 +3,8 @@
 db_name = '/tmp/payments.db'
 
 #qiwi
-qiwi_login_url = 'https://auth.qiwi.com/cas/tgts'
-qiwi_payments_url = 'https://visa.qiwi.com/report/list.action?type=1'
+qiwi_login_url = 'https://sso.qiwi.com/cas/tgts'
+qiwi_payments_url = 'https://qiwi.com/report/list.action?type=1'
 qiwi_login = 'login'
 qiwi_pass = 'pass'
 
