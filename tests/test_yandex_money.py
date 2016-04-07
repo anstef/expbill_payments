@@ -21,6 +21,10 @@ class YandexMoneyPaymentsParsingTest(unittest.TestCase):
         self.assertEqual(transaction.payer, 'nc2232')
         self.assertEqual(transaction.sum, u'895.52')
 
+        transaction = self.provider.parse_payment_message(yandex_money_data.valid_body3)
+        self.assertEqual(transaction.payer, 'nc123')
+        self.assertEqual(transaction.sum, u'199')
+
     def test_parse_invalid_body(self):
         self.assertIsNone(self.provider.parse_payment_message(u'<div></div>'))
 

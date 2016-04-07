@@ -16,6 +16,11 @@ class QiwiTest(unittest.TestCase):
         qiwi.error_logger.disabled = True
         qiwi.success_logger.disabled = True
         qiwi.settings.db_name = '/tmp/test_payments1.db'
+
+        conn = sqlite3.connect(qiwi.settings.db_name)
+        c = conn.cursor()
+        c.execute("CREATE TABLE IF NOT EXISTS transactions (trans_id TEXT)")
+
         self.qiwi = qiwi.Qiwi()
 
     def tearDown(self):
@@ -53,17 +58,16 @@ class TestQiwiLastPaymentsPage(QiwiTest):
         self.assertEqual(mock_post.call_count, 2)
         self.assertEqual(
             str(mock_post.call_args_list[0]),
-            "call('%s', headers={'X-Requested-With': 'XMLHttpRequest', "
-            "'Accept': 'application/json, text/javascript, */*; q=0.01'}, "
-            "data={'login': '%s', 'password': '%s'})" %
+            'call(\'%s\', headers={\'Content-Type\': \'application/json\'}, data=\'{"login": "%s", "password": "%s"}\')' %
             (qiwi.settings.qiwi_login_url, qiwi.settings.qiwi_login, qiwi.settings.qiwi_pass))
         self.assertEqual(
             str(mock_post.call_args_list[1]),
-            "call(u'https://auth.qiwi.com/cas/sts', headers={'X-Requested-With': 'XMLHttpRequest', "
-            "'Accept': 'application/json, text/javascript, */*; q=0.01'}, "
-            "data={'ticket': u'TGT-123', 'service': 'https://visa.qiwi.com/j_spring_cas_security_check'})")
+            'call(u\'https://auth.qiwi.com/cas/sts\', headers={\'Content-Type\': \'application/json\'}, data=\'{"ticket": "TGT-123", "service": "https://qiwi.com/j_spring_cas_security_check"}\')')
         self.assertEqual(
             str(mock_get.call_args_list[0]),
+            "call(u'https://qiwi.com/j_spring_cas_security_check?ticket=TGT-123')")
+        self.assertEqual(
+            str(mock_get.call_args_list[1]),
             "call('%s')" % (qiwi.settings.qiwi_payments_url))
 
     def test_failed_auth(self, mock_get, mock_post, *args):
