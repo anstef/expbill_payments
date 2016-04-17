@@ -13,12 +13,20 @@ ym_mail_server = 'imap.yandex.ru'
 ym_mail_port = '993'
 ym_mail_login = 'your-notification-mail@yandex.ru'
 ym_mail_pass = 'q123'
+ym_sender_mail = 'inform@money.yandex.ru'
+
+#osmp
+osmp_mail_server = 'imap.yandex.ru'
+osmp_mail_port = '993'
+osmp_mail_login = 'your-notification-mail@yandex.ru'
+osmp_mail_pass = 'q123'
+osmp_sender_mail = 'registry@osmp.ru'
 
 #billing
 billing_payment_url = 'http://yourbilling.com/payments.simpleterminal/simpleterminal/payment/'
 billing_secret = '123456'
 
-#email
+#payment notification email
 email_from = 'robot@yoursite.com'
 email_from_pass = 'q123'
 email_to = 'admin@yoursite.com'

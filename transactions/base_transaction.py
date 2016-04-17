@@ -74,7 +74,7 @@ class BaseTransaction(object):
 
     def process(self):
         self.save()
-        if self.cursor:
+        if self.cursor and self.trans_id:
             self.cursor.execute("INSERT INTO transactions VALUES(%s)" % self.trans_id)
 
     def save(self):

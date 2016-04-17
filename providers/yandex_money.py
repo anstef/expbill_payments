@@ -58,7 +58,7 @@ class YandexMoney(BaseProvider):
         self.mail_conn.select('INBOX')
 
     def _get_unread(self):
-        status, response = self.mail_conn.search(None, '(UNSEEN)')
+        status, response = self.mail_conn.search(None, '(UNSEEN FROM "%s")' % settings.ym_sender_mail)
         if status != 'OK':
             raise YandexMoneyProcessException(u"Can't get unread messages. Status: %s" % status)
 
