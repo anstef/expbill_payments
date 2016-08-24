@@ -26,7 +26,7 @@ class Qiwi(BaseProvider):
 
     def process(self):
         try:
-            success_logger.info("Start processing")
+            success_logger.info("Start Qiwi processing")
             self._process()
         except QiwiProcessException, e:
             error_logger.error(e)
@@ -34,7 +34,7 @@ class Qiwi(BaseProvider):
             error_logger.exception(e)
         finally:
             self.close_db_conn()
-            success_logger.info("Stop processing")
+            success_logger.info("Stop Qiwi processing")
 
     def get_payments(self):
         try:
