@@ -15,6 +15,8 @@ class OsmpProcessException(Exception):
 
 
 class Osmp(BaseProvider):
+    provider_name = 'osmp'
+
     def process(self):
         try:
             success_logger.info("Start processing")

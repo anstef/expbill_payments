@@ -17,6 +17,8 @@ class QiwiProcessException(Exception):
 
 
 class Qiwi(BaseProvider):
+    provider_name = 'qiwi'
+
     def __init__(self):
         super(Qiwi, self).__init__()
         self.conn = sqlite3.connect(settings.db_name)
@@ -26,7 +28,7 @@ class Qiwi(BaseProvider):
 
     def process(self):
         try:
-            success_logger.info("Start Qiwi processing")
+            success_logger.info("Start %s processing" % self.provider_name)
             self._process()
         except QiwiProcessException, e:
             error_logger.error(e)
@@ -34,7 +36,7 @@ class Qiwi(BaseProvider):
             error_logger.exception(e)
         finally:
             self.close_db_conn()
-            success_logger.info("Stop Qiwi processing")
+            success_logger.info("Stop %s processing" % self.provider_name)
 
     def get_payments(self):
         try:

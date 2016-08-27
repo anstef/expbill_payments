@@ -16,16 +16,17 @@ class YandexMoneyProcessException(Exception):
 
 
 class YandexMoney(BaseProvider):
+    provider_name = 'ym'
     def process(self):
         try:
-            success_logger.info("Start YM processing")
+            success_logger.info("Start %s processing" % self.provider_name)
             self._process()
         except YandexMoneyProcessException, e:
             error_logger.error(e)
         except Exception, e:
             error_logger.exception(e)
         finally:
-            success_logger.info("Stop YM processing")
+            success_logger.info("Stop %s processing" % self.provider_name)
 
     def get_payments(self):
         self._mail_connect()

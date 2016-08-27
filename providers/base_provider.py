@@ -5,6 +5,7 @@ from logger import success_logger
 
 
 class BaseProvider(object):
+    provider_name = 'base'
     def __init__(self):
         pass
 
@@ -21,4 +22,4 @@ class BaseProvider(object):
             payment.process()
 
         if not has_valid_payments:
-            success_logger.info('There are no new payments')
+            success_logger.info('There are no %s new payments' % self.provider_name)
