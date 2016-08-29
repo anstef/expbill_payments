@@ -3,6 +3,7 @@
 
 import imaplib
 import email
+import socket
 
 import settings
 from logger import success_logger, error_logger
@@ -48,9 +49,12 @@ class Osmp(BaseProvider):
         return payments
 
     def _mail_connect(self):
-        self.mail_conn = imaplib.IMAP4_SSL(settings.osmp_mail_server, settings.osmp_mail_port)
-        self.mail_conn.login(settings.osmp_mail_login, settings.osmp_mail_pass)
-        self.mail_conn.select('INBOX')
+        try:
+            self.mail_conn = imaplib.IMAP4_SSL(settings.osmp_mail_server, settings.osmp_mail_port)
+            self.mail_conn.login(settings.osmp_mail_login, settings.osmp_mail_pass)
+            self.mail_conn.select('INBOX')
+        except socket.error as exc:
+            raise OsmpProcessException(u"Can't connect mail. Error: %s" % exc)
 
     def _get_unread(self):
         status, response = self.mail_conn.search(None, '(UNSEEN FROM "%s")' % settings.osmp_sender_mail)
