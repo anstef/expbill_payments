@@ -14,6 +14,7 @@ class PaymentTransactionTest(unittest.TestCase):
     def setUp(self):
         self.conn = sqlite3.connect('/tmp/test_payments1.db')
         self.cur = self.conn.cursor()
+        self.cur.execute("CREATE TABLE IF NOT EXISTS transactions (trans_id TEXT)")
         base_transaction.error_logger.disabled = True
         base_transaction.success_logger.disabled = True
 

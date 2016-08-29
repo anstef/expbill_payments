@@ -17,16 +17,11 @@ class OsmpProcessException(Exception):
 class Osmp(BaseProvider):
     provider_name = 'osmp'
 
-    def process(self):
+    def _process(self):
         try:
-            success_logger.info("Start processing")
-            self._process()
+            super(Osmp, self)._process()
         except OsmpProcessException, e:
             error_logger.error(e)
-        except Exception, e:
-            error_logger.exception(e)
-        finally:
-            success_logger.info("Stop processing")
 
     def get_payments(self):
         self._mail_connect()

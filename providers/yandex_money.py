@@ -17,16 +17,12 @@ class YandexMoneyProcessException(Exception):
 
 class YandexMoney(BaseProvider):
     provider_name = 'ym'
-    def process(self):
+
+    def _process(self):
         try:
-            success_logger.info("Start %s processing" % self.provider_name)
-            self._process()
+            super(YandexMoney, self)._process()    
         except YandexMoneyProcessException, e:
             error_logger.error(e)
-        except Exception, e:
-            error_logger.exception(e)
-        finally:
-            success_logger.info("Stop %s processing" % self.provider_name)
 
     def get_payments(self):
         self._mail_connect()
@@ -59,7 +55,7 @@ class YandexMoney(BaseProvider):
         self.mail_conn.select('INBOX')
 
     def _get_unread(self):
-        status, response = self.mail_conn.search(None, '(UNSEEN HEADER SENDER "%s")' % settings.ym_sender_mail)
+        status, response = self.mail_conn.search(None, '(UNSEEN FROM "%s")' % settings.ym_sender_mail)
         if status != 'OK':
             raise YandexMoneyProcessException(u"Can't get unread messages. Status: %s" % status)
 

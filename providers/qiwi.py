@@ -26,17 +26,13 @@ class Qiwi(BaseProvider):
         self.cur.execute("CREATE TABLE IF NOT EXISTS transactions (trans_id TEXT)")
         #self.cur.execute("DELETE FROM transactions")
 
-    def process(self):
+    def _process(self):
         try:
-            success_logger.info("Start %s processing" % self.provider_name)
-            self._process()
+            super(Qiwi, self)._process()
         except QiwiProcessException, e:
             error_logger.error(e)
-        except Exception, e:
-            error_logger.exception(e)
         finally:
             self.close_db_conn()
-            success_logger.info("Stop %s processing" % self.provider_name)
 
     def get_payments(self):
         try:
